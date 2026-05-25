@@ -36,6 +36,7 @@ npx prisma migrate dev
 
 ### estrutura
 
+```
 backend/
 ├── docker-compose.yml
 ├── .env
@@ -43,9 +44,11 @@ backend/
 ├── src/
 ├── package.json
 └── Dockerfile
+```
 
 ## estrutura com docker-compose.yml
 
+```
 backend/
 ├── docker-compose.yml
 ├── .env
@@ -56,6 +59,7 @@ backend/
 └── src/
     ├── server.js
     └── routes/
+```
 
 ## docker-compose.yml
 
@@ -135,27 +139,6 @@ EXPOSE 3000
 CMD ["npm", "run", "dev"]
 ```
 
-## schema.prisma
-
-```prisma
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model Empresa {
-  id          Int    @id @default(autoincrement())
-  razaoSocial String @map("razao_social")
-  cnpj        String
-
-  @@map("empresa")
-}
-```
-
 ## Inicialização completa
 
 ### 1. Subir containers
@@ -172,15 +155,15 @@ npx prisma migrate dev --name init
 
 ## PgAdmin
 
-Acesso:
+**Acesso**
 
-http://localhost:8080
+`http://localhost:8080`
 
-Login:
+**Login**
 
-admin@admin.com
+`admin@admin.com`
 
-Senha:
+**Senha**
 
-admin
+`admin`
 
