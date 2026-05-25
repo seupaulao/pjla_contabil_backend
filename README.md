@@ -1,169 +1,113 @@
 # pjla_contabil_backend
 
-### build da imagem
+## objetivo
 
-docker build -t meu-postgres .
+backend de escritorio contabil
 
-### rodar container
+## ler os arquivos
+- processo1.md
+- processo2.md
 
-docker run -d \
-  --name postgres-db \
-  -p 5432:5432 \
-  -v postgres_data:/var/lib/postgresql/data \
-  meu-postgres
+para saber como lidar com a arquitetura
+- docker
+- docker compose
+- prisma orm
 
-### string conexao
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/meubanco?schema=public"
+## tecnologias
+- nodejs
+- prisma orm
+- fastfy
+- dotenv
 
-### entrar no banco
+## OBSERVAÇÕES
 
-docker exec -it postgres-db psql -U postgres -d meubanco
+tentar subir tudo no docker compose
 
-###  fastify com prisma
+tratar a base de dados direto do ORM
 
-npm install @prisma/client
-npm install -D prisma
+usar `npx prisma studio` ou `pgdmin`
 
-### iniciando prisma
+gerar endpoints no fastfy
 
-npx prisma init
+## endpoints
 
-### testando conexao
+### plano_contas_referencial
 
-npx prisma db pull 
-ou
-npx prisma migrate dev
+GET /api/plano_contas_referencial
+GET /api/plano_contas_referencial/{id}
+POST /api/plano_contas_referencial
+PUT /api/plano_contas_referencial/{id}
+DELETE /api/plano_contas_referencial/{id}
 
-### estrutura
+### empresa
 
-```
-backend/
-├── docker-compose.yml
-├── .env
-├── prisma/
-├── src/
-├── package.json
-└── Dockerfile
-```
+GET /api/empresa
+GET /api/empresa/{id}
+GET /api/empresa/{cnpj}
+POST /api/empresa
+PUT /api/empresa/{id}
+DELETE /api/empresa/{id}
 
-## estrutura com docker-compose.yml
+### plano_contas
 
-```
-backend/
-├── docker-compose.yml
-├── .env
-├── Dockerfile
-├── package.json
-├── prisma/
-│   └── schema.prisma
-└── src/
-    ├── server.js
-    └── routes/
-```
+GET /api/plano_contas
+GET /api/plano_contas/{id}
+POST /api/plano_contas
+PUT /api/plano_contas/{id}
+DELETE /api/plano_contas/{id}
+GET /api/empresa/{id}/plano_contas/{codigo}
+GET /api/empresa/{id}/plano_contas/{nome}
 
-## docker-compose.yml
+### centro de custo
+GET /api/centro_custos
+GET /api/empresa/{id}/centro_custos
+GET /api/empresa/{id}/centro_custos/{id}
+GET /api/centro_custos/{id}
+POST /api/centro_custos
+PUT /api/centro_custos/{id}
+DELETE /api/centro_custos/{id}
 
-```yaml
-services:
 
-  postgres:
-    image: postgres:16
-    container_name: postgres-db
+### lancamento
 
-    restart: always
+GET /api/lancamento
+GET /api/lancamento/{data}
+GET /api/empresa/{id}/lancamento
+GET /api/empresa/{id}/lancamento/{data}
+GET /api/lancamento/{id}
+GET /api/lancamento/{id}/itens
+POST /api/lancamento
+PUT /api/lancamento/{id}
+PUT /api/lancamento/{id}/item/{idLancamentoItem}
+DELETE /api/lancamento/{id}/item/{idLancamentoItem}
+DELETE /api/lancamento/{id}
 
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: contabilidade
+### mapa das demonstracoes
 
-    ports:
-      - "5432:5432"
+GET /api/mapademonstracoes
+GET /api/mapademonstracoes/{id}
+GET /api/plano_contas/{id}/mapademonstracoes/{id}
+POST /api/mapademonstracoes
+PUT /api/mapademonstracoes/{id}
+DELETE /api/mapademonstracoes/{id}
 
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+### SpedMapping
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
+GET /api/spedmapping
+GET /api/spedmapping/{id}
+GET /api/plano_contas/{contaid}/spedmapping
+GET /api/plano_contas/{contaid}/spedmapping/{id}
+GET /api/plano_contas/{contaid}/spedmapping/{spedcode}
+POST /api/spedmapping
+PUT /api/spedmapping/{id}
+DELETE /api/spedmapping/{id}
 
-    restart: always
+### Usuario
 
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-
-    ports:
-      - "8080:80"
-
-    depends_on:
-      - postgres
-
-  api:
-    build: .
-
-    container_name: fastify-api
-
-    restart: always
-
-    ports:
-      - "3000:3000"
-
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/contabilidade?schema=public
-
-    depends_on:
-      - postgres
-
-volumes:
-  postgres_data:
-```
-
-## dockerfile da apinode
-
-```yaml
-FROM node:22
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-RUN npx prisma generate
-
-EXPOSE 3000
-
-CMD ["npm", "run", "dev"]
-```
-
-## Inicialização completa
-
-### 1. Subir containers
-
-docker compose up -d
-
-### 2. Entrar no container API
-
-docker exec -it fastify-api sh
-
-### 3. Criar migration
-
-npx prisma migrate dev --name init
-
-## PgAdmin
-
-**Acesso**
-
-`http://localhost:8080`
-
-**Login**
-
-`admin@admin.com`
-
-**Senha**
-
-`admin`
+GET /api/usuario
+GET /api/usuario/{id}
+GET /api/usuario/{isActive}
+POST /api/usuario
+PUT /api/usuario/{id}
+DELETE /api/usuario/{id}
 

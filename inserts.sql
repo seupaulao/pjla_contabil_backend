@@ -147,100 +147,100 @@ VALUES
 -- ============================================================
 
 -- Nível 1
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
 VALUES
-  (1, 1, '1', 'Ativo',              'S', 'D', 1, NULL, '1', 'ATIVO',     0),
-  (1, 2, '2', 'Passivo',            'S', 'C', 1, NULL, '2', 'PASSIVO',   0),
-  (1, 3, '3', 'Patrimônio Líquido', 'S', 'C', 1, NULL, '3', 'PL',        0),
-  (1, 4, '4', 'Receita',            'S', 'C', 1, NULL, '4', 'RESULTADO', 0),
-  (1, 5, '5', 'Despesa',            'S', 'D', 1, NULL, '5', 'RESULTADO', 0);
+  (1, 1, 1, '1', 'Ativo',              'S', 'D', 1, NULL, '1', 'ATIVO',     0),
+  (2, 1, 2, '2', 'Passivo',            'S', 'C', 1, NULL, '2', 'PASSIVO',   0),
+  (3, 1, 3, '3', 'Patrimônio Líquido', 'S', 'C', 1, NULL, '3', 'PL',        0),
+  (4, 1, 4, '4', 'Receita',            'S', 'C', 1, NULL, '4', 'RESULTADO', 0),
+  (5, 1, 5, '5', 'Despesa',            'S', 'D', 1, NULL, '5', 'RESULTADO', 0);
 
 -- Nível 2 – Ativo
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 11, '1.1', 'Caixa',            'A', 'D', 2, id, '1.1', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 12, '1.2', 'Banco',            'S', 'D', 2, id, '1.2', 'ATIVO', 0 FROM plano_contas WHERE codigo = '1';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 13, '1.3', 'Contas a Receber', 'S', 'D', 2, id, '1.3', 'ATIVO', 0 FROM plano_contas WHERE codigo = '1';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 14, '1.4', 'Imobilizado',      'S', 'D', 2, id, '1.4', 'ATIVO', 0 FROM plano_contas WHERE codigo = '1';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 6, 1, 11, '1.1', 'Caixa',            'A', 'D', 2, id, '1.1', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 7, 1, 12, '1.2', 'Banco',            'S', 'D', 2, id, '1.2', 'ATIVO', 0 FROM plano_contas WHERE codigo = '1';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 8, 1, 13, '1.3', 'Contas a Receber', 'S', 'D', 2, id, '1.3', 'ATIVO', 0 FROM plano_contas WHERE codigo = '1';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 9, 1, 14, '1.4', 'Imobilizado',      'S', 'D', 2, id, '1.4', 'ATIVO', 0 FROM plano_contas WHERE codigo = '1';
 
 -- Nível 2 – Passivo
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 21, '2.1', 'Fornecedores',        'A', 'C', 2, id, '2.1', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 22, '2.2', 'Impostos a Recolher', 'S', 'C', 2, id, '2.2', 'PASSIVO', 0 FROM plano_contas WHERE codigo = '2';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 23, '2.3', 'INSS a Recolher',     'A', 'C', 2, id, '2.3', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 24, '2.4', 'Pró-labore a Pagar',  'A', 'C', 2, id, '2.4', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 10, 1, 21, '2.1', 'Fornecedores',        'A', 'C', 2, id, '2.1', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 11, 1, 22, '2.2', 'Impostos a Recolher', 'S', 'C', 2, id, '2.2', 'PASSIVO', 0 FROM plano_contas WHERE codigo = '2';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 12, 1, 23, '2.3', 'INSS a Recolher',     'A', 'C', 2, id, '2.3', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 13, 1, 24, '2.4', 'Pró-labore a Pagar',  'A', 'C', 2, id, '2.4', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2';
 
 -- Nível 2 – Patrimônio Líquido
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 31, '3.1', 'Capital Social',        'A', 'C', 2, id, '3.1', 'PL', 1 FROM plano_contas WHERE codigo = '3';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 32, '3.2', 'Lucros Acumulados',     'A', 'C', 2, id, '3.2', 'PL', 1 FROM plano_contas WHERE codigo = '3';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 33, '3.3', 'Distribuição de Lucros','A', 'C', 2, id, '3.3', 'PL', 1 FROM plano_contas WHERE codigo = '3';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 14, 1, 31, '3.1', 'Capital Social',        'A', 'C', 2, id, '3.1', 'PL', 1 FROM plano_contas WHERE codigo = '3';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 15, 1, 32, '3.2', 'Lucros Acumulados',     'A', 'C', 2, id, '3.2', 'PL', 1 FROM plano_contas WHERE codigo = '3';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 16, 1, 33, '3.3', 'Distribuição de Lucros','A', 'C', 2, id, '3.3', 'PL', 1 FROM plano_contas WHERE codigo = '3';
 
 -- Nível 2 – Receita
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 41, '4.1', 'Receita de Plantão',     'S', 'C', 2, id, '4.1', 'RESULTADO', 'RECEITA_BRUTA',     0 FROM plano_contas WHERE codigo = '4';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 42, '4.2', 'Receita de Consultas',   'A', 'C', 2, id, '4.2', 'RESULTADO', 'RECEITA_BRUTA',     1 FROM plano_contas WHERE codigo = '4';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 43, '4.3', 'Rendimentos Financeiros','A', 'C', 2, id, '4.3', 'RESULTADO', 'RECEITA_FINANCEIRA', 1 FROM plano_contas WHERE codigo = '4';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 17, 1, 41, '4.1', 'Receita de Plantão',     'S', 'C', 2, id, '4.1', 'RESULTADO', 'RECEITA_BRUTA',     0 FROM plano_contas WHERE codigo = '4';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 18, 1, 42, '4.2', 'Receita de Consultas',   'A', 'C', 2, id, '4.2', 'RESULTADO', 'RECEITA_BRUTA',     1 FROM plano_contas WHERE codigo = '4';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 19, 1, 43, '4.3', 'Rendimentos Financeiros','A', 'C', 2, id, '4.3', 'RESULTADO', 'RECEITA_FINANCEIRA', 1 FROM plano_contas WHERE codigo = '4';
 
 -- Nível 2 – Despesa
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 51,  '5.1',  'Aluguel',          'A', 'D', 2, id, '5.1',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 52,  '5.2',  'Internet',         'A', 'D', 2, id, '5.2',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 53,  '5.3',  'Energia',          'A', 'D', 2, id, '5.3',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 54,  '5.4',  'Software',         'A', 'D', 2, id, '5.4',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 55,  '5.5',  'Contabilidade',    'A', 'D', 2, id, '5.5',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 56,  '5.6',  'Pró-labore',       'A', 'D', 2, id, '5.6',  'RESULTADO', 'DESPESA_PESSOAL',    1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 57,  '5.7',  'INSS',             'A', 'D', 2, id, '5.7',  'RESULTADO', 'DESPESA_PESSOAL',    1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 58,  '5.8',  'DAS',              'A', 'D', 2, id, '5.8',  'RESULTADO', 'DESPESA_TRIBUTARIA', 1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 59,  '5.9',  'ISS',              'A', 'D', 2, id, '5.9',  'RESULTADO', 'DESPESA_TRIBUTARIA', 1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 510, '5.10', 'Tarifas Bancárias','A', 'D', 2, id, '5.10', 'RESULTADO', 'DESPESA_FINANCEIRA', 1 FROM plano_contas WHERE codigo = '5';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 511, '5.11', 'Juros',            'A', 'D', 2, id, '5.11', 'RESULTADO', 'DESPESA_FINANCEIRA', 1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 20, 1, 51,  '5.1',  'Aluguel',          'A', 'D', 2, id, '5.1',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 21, 1, 52,  '5.2',  'Internet',         'A', 'D', 2, id, '5.2',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 22, 1, 53,  '5.3',  'Energia',          'A', 'D', 2, id, '5.3',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 23, 1, 54,  '5.4',  'Software',         'A', 'D', 2, id, '5.4',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 24, 1, 55,  '5.5',  'Contabilidade',    'A', 'D', 2, id, '5.5',  'RESULTADO', 'DESPESA_OPERACIONAL', 1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 25, 1, 56,  '5.6',  'Pró-labore',       'A', 'D', 2, id, '5.6',  'RESULTADO', 'DESPESA_PESSOAL',    1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 26, 1, 57,  '5.7',  'INSS',             'A', 'D', 2, id, '5.7',  'RESULTADO', 'DESPESA_PESSOAL',    1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 27, 1, 58,  '5.8',  'DAS',              'A', 'D', 2, id, '5.8',  'RESULTADO', 'DESPESA_TRIBUTARIA', 1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 28, 1, 59,  '5.9',  'ISS',              'A', 'D', 2, id, '5.9',  'RESULTADO', 'DESPESA_TRIBUTARIA', 1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 29, 1, 510, '5.10', 'Tarifas Bancárias','A', 'D', 2, id, '5.10', 'RESULTADO', 'DESPESA_FINANCEIRA', 1 FROM plano_contas WHERE codigo = '5';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 30, 1, 511, '5.11', 'Juros',            'A', 'D', 2, id, '5.11', 'RESULTADO', 'DESPESA_FINANCEIRA', 1 FROM plano_contas WHERE codigo = '5';
 
 -- Nível 3 – Banco
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 121, '1.2.1', 'Conta Corrente', 'A', 'D', 3, id, '1.2.1', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.2';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 122, '1.2.2', 'Conta Digital',  'A', 'D', 3, id, '1.2.2', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.2';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 31, 1, 121, '1.2.1', 'Conta Corrente', 'A', 'D', 3, id, '1.2.1', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.2';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 32, 1, 122, '1.2.2', 'Conta Digital',  'A', 'D', 3, id, '1.2.2', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.2';
 
 -- Nível 3 – Contas a Receber
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 131, '1.3.1', 'Hospital A', 'A', 'D', 3, id, '1.3.1', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.3';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 132, '1.3.2', 'Hospital B', 'A', 'D', 3, id, '1.3.2', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.3';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 33, 1, 131, '1.3.1', 'Hospital A', 'A', 'D', 3, id, '1.3.1', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.3';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 34, 1, 132, '1.3.2', 'Hospital B', 'A', 'D', 3, id, '1.3.2', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.3';
 
 -- Nível 3 – Imobilizado
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 141, '1.4.1', 'Equipamentos', 'A', 'D', 3, id, '1.4.1', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.4';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 142, '1.4.2', 'Computadores', 'A', 'D', 3, id, '1.4.2', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.4';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 35, 1, 141, '1.4.1', 'Equipamentos', 'A', 'D', 3, id, '1.4.1', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.4';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 36, 1, 142, '1.4.2', 'Computadores', 'A', 'D', 3, id, '1.4.2', 'ATIVO', 1 FROM plano_contas WHERE codigo = '1.4';
 
 -- Nível 3 – Impostos (Passivo)
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 221, '2.2.1', 'DAS a Recolher', 'A', 'C', 3, id, '2.2.1', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2.2';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
-SELECT 1, 222, '2.2.2', 'ISS a Recolher', 'A', 'C', 3, id, '2.2.2', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2.2';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 37, 1, 221, '2.2.1', 'DAS a Recolher', 'A', 'C', 3, id, '2.2.1', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2.2';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, aceita_lancamento)
+SELECT 38, 1, 222, '2.2.2', 'ISS a Recolher', 'A', 'C', 3, id, '2.2.2', 'PASSIVO', 1 FROM plano_contas WHERE codigo = '2.2';
 
 -- Nível 3 – Receita de Plantão
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 411, '4.1.1', 'Plantão Hospital A', 'A', 'C', 3, id, '4.1.1', 'RESULTADO', 'RECEITA_BRUTA', 1 FROM plano_contas WHERE codigo = '4.1';
-INSERT INTO plano_contas (empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
-SELECT 1, 412, '4.1.2', 'Plantão Hospital B', 'A', 'C', 3, id, '4.1.2', 'RESULTADO', 'RECEITA_BRUTA', 1 FROM plano_contas WHERE codigo = '4.1';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 39, 1, 411, '4.1.1', 'Plantão Hospital A', 'A', 'C', 3, id, '4.1.1', 'RESULTADO', 'RECEITA_BRUTA', 1 FROM plano_contas WHERE codigo = '4.1';
+INSERT INTO plano_contas (id, empresa_id, plano_contas_referencial_id, codigo, descricao, tipo, natureza, nivel, conta_pai_id, codigo_referencial, grupo, dre_grupo, aceita_lancamento)
+SELECT 40, 1, 412, '4.1.2', 'Plantão Hospital B', 'A', 'C', 3, id, '4.1.2', 'RESULTADO', 'RECEITA_BRUTA', 1 FROM plano_contas WHERE codigo = '4.1';

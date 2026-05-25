@@ -67,7 +67,7 @@ CREATE TABLE plano_contas (
   nivel INTEGER NOT NULL,
   conta_pai_id INTEGER REFERENCES plano_contas(id),
   codigo_referencial TEXT,
-  aceita_lancamento BOOLEAN DEFAULT TRUE,
+  aceita_lancamento INTEGER DEFAULT 0,
   grupo TEXT,
   subgrupo TEXT,
   dre_grupo TEXT,
