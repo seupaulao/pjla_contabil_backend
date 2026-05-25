@@ -1,0 +1,608 @@
+// ==========================================================
+// PRISMA SCHEMA - CONTABILIDADE
+// Convertido de PostgreSQL
+// ==========================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================================
+// ENUMS
+// ==========================================================
+
+enum LancamentoTipo {
+  D
+  C
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// ==========================================================
+// EMPRESA
+// ==========================================================
+
+model Empresa {
+  id          Int       @id @default(autoincrement())
+  cnpj        String
+  nome        String
+  uf          String?
+  municipio   String?
+  dataInicio  DateTime? @map("data_inicio") @db.Date
+  dataFim     DateTime? @map("data_fim") @db.Date
+  createdAt   DateTime  @default(now()) @map("created_at")
+  excluidoAt  DateTime? @map("excluido_at")
+
+  planoContas              PlanoContas[]
+  centroCustos             CentroCusto[]
+  lancamentos              Lancamento[]
+  reportTemplates          ReportTemplate[]
+  tags                     Tag[]
+  reportVersions           ReportVersion[]
+  travaContabil            TravaContabil[]
+  certificadosDigitais     CertificadoDigital[]
+  ecdArquivos              EcdArquivo[]
+  spedEntregas             SpedEntrega[]
+  configuracao             EmpresaConfiguracao?
+  empresaUsuarios          EmpresaUsuario[]
+  auditLogs                AuditLog[]
+
+  @@map("empresa")
+}
+
+// ==========================================================
+// REPORT TYPES
+// ==========================================================
+
+model ReportType {
+  id    String @id @default(uuid()) @db.Uuid
+  code  String @unique @db.VarChar(30)
+  name  String
+
+  reportTemplates ReportTemplate[]
+  reportVersions  ReportVersion[]
+
+  @@map("report_types")
+}
+
+// ==========================================================
+// PLANO DE CONTAS REFERENCIAL
+// ==========================================================
+
+model PlanoContasReferencial {
+  id                     Int      @id
+  codigo                 String
+  nome                   String
+  tipo                   String?
+  natureza               String?
+  nivel                  Int?
+  grupo                  String?
+  dreGrupo               String?  @map("dre_grupo")
+  fluxoCaixaTipo         String?  @map("fluxo_caixa_tipo")
+  createdAt              DateTime @default(now()) @map("created_at")
+  excludedAt             DateTime? @map("excluded_at")
+
+  parentId               Int? @map("parent_id")
+  parent                 PlanoContasReferencial? @relation("PlanoRefHierarchy", fields: [parentId], references: [id])
+  children               PlanoContasReferencial[] @relation("PlanoRefHierarchy")
+
+  planoContas            PlanoContas[]
+
+  @@map("plano_contas_referencial")
+}
+
+// ==========================================================
+// PLANO DE CONTAS
+// ==========================================================
+
+model PlanoContas {
+  id                          Int      @id
+  empresaId                   Int?     @map("empresa_id")
+  planoContasReferencialId    Int?     @map("plano_contas_referencial_id")
+  codigo                      String
+  descricao                   String
+  tipo                        String
+  natureza                    String?
+  nivel                       Int
+  codigoReferencial           String?  @map("codigo_referencial")
+  aceitaLancamento            Boolean  @default(true) @map("aceita_lancamento")
+  grupo                       String?
+  subgrupo                    String?
+  dreGrupo                    String?  @map("dre_grupo")
+  fluxoCaixaTipo              String?  @map("fluxo_caixa_tipo")
+  createdAt                   DateTime @default(now()) @map("created_at")
+  excluidoAt                  DateTime? @map("excluido_at")
+
+  contaPaiId                  Int? @map("conta_pai_id")
+
+  empresa                     Empresa? @relation(fields: [empresaId], references: [id])
+  planoReferencial            PlanoContasReferencial? @relation(fields: [planoContasReferencialId], references: [id])
+
+  contaPai                    PlanoContas? @relation("PlanoContasHierarchy", fields: [contaPaiId], references: [id])
+  subContas                   PlanoContas[] @relation("PlanoContasHierarchy")
+
+  lancamentoItens             LancamentoItem[]
+  reportLineAccounts          ReportLineAccount[]
+  mapaDemonstracoes           MapaDemonstracoes[]
+  spedMappings                SpedMapping[]
+
+  @@map("plano_contas")
+}
+
+// ==========================================================
+// CENTRO DE CUSTO
+// ==========================================================
+
+model CentroCusto {
+  id         String   @id @default(uuid()) @db.Uuid
+  empresaId  Int      @map("empresa_id")
+  codigo     String?
+  nome       String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  empresa            Empresa @relation(fields: [empresaId], references: [id])
+  lancamentoItens    LancamentoItem[]
+
+  @@map("centro_custo")
+}
+
+// ==========================================================
+// LANÇAMENTO
+// ==========================================================
+
+model Lancamento {
+  id          Int       @id
+  empresaId   Int?      @map("empresa_id")
+  data        DateTime  @db.Date
+  historico   String?
+  tipo        String    @default("N")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  excluidoAt  DateTime? @map("excluido_at")
+
+  empresa      Empresa? @relation(fields: [empresaId], references: [id])
+  itens        LancamentoItem[]
+
+  @@index([data], map: "idx_lancamento_data")
+  @@map("lancamento")
+}
+
+model LancamentoItem {
+  id               Int             @id
+  lancamentoId     Int?            @map("lancamento_id")
+  contaId          Int?            @map("conta_id")
+  centroCustoId    String?         @map("centro_custo_id") @db.Uuid
+  tipo             LancamentoTipo
+  valor            Decimal         @db.Decimal(14, 2)
+
+  lancamento       Lancamento?     @relation(fields: [lancamentoId], references: [id], onDelete: Cascade)
+  conta            PlanoContas?    @relation(fields: [contaId], references: [id])
+  centroCusto      CentroCusto?    @relation(fields: [centroCustoId], references: [id])
+
+  tags             LancamentoItemTag[]
+
+  @@index([contaId], map: "idx_lancamento_item_conta")
+  @@map("lancamento_item")
+}
+
+// ==========================================================
+// REPORT TEMPLATES
+// ==========================================================
+
+model ReportTemplate {
+  id             String   @id @default(uuid()) @db.Uuid
+  empresaId      Int?     @map("empresa_id")
+  reportTypeId   String   @map("report_type_id") @db.Uuid
+  name           String
+  isDefault      Boolean  @default(false) @map("is_default")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  empresa         Empresa? @relation(fields: [empresaId], references: [id])
+  reportType      ReportType @relation(fields: [reportTypeId], references: [id])
+
+  lines           ReportTemplateLine[]
+  reportVersions  ReportVersion[]
+  configuracoes   EmpresaConfiguracao[]
+
+  @@map("report_templates")
+}
+
+model ReportTemplateLine {
+  id          String   @id @default(uuid()) @db.Uuid
+  templateId  String   @map("template_id") @db.Uuid
+  lineOrder   Int      @map("line_order")
+  code        String?
+  title       String
+  lineType    String   @map("line_type")
+  formula     String?
+  isBold      Boolean  @default(false) @map("is_bold")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  parentId    String? @map("parent_id") @db.Uuid
+
+  template    ReportTemplate @relation(fields: [templateId], references: [id])
+
+  parent      ReportTemplateLine? @relation("ReportLineHierarchy", fields: [parentId], references: [id])
+  children    ReportTemplateLine[] @relation("ReportLineHierarchy")
+
+  accounts    ReportLineAccount[]
+
+  @@map("report_template_lines")
+}
+
+model ReportLineAccount {
+  id            String @id @default(uuid()) @db.Uuid
+  reportLineId  String @map("report_line_id") @db.Uuid
+  contaId       Int    @map("conta_id")
+
+  reportLine    ReportTemplateLine @relation(fields: [reportLineId], references: [id])
+  conta         PlanoContas @relation(fields: [contaId], references: [id])
+
+  @@map("report_line_accounts")
+}
+
+// ==========================================================
+// MAPA DEMONSTRAÇÕES
+// ==========================================================
+
+model MapaDemonstracoes {
+  id           Int       @id @default(autoincrement())
+  contaId      Int?      @map("conta_id")
+  tipo         String?
+  categoria    String?
+  excluidoAt   DateTime? @map("excluido_at")
+
+  conta        PlanoContas? @relation(fields: [contaId], references: [id])
+
+  @@map("mapa_demonstracoes")
+}
+
+// ==========================================================
+// TAGS
+// ==========================================================
+
+model Tag {
+  id          String @id @default(uuid()) @db.Uuid
+  empresaId   Int?   @map("empresa_id")
+  name        String
+
+  empresa      Empresa? @relation(fields: [empresaId], references: [id])
+  lancamentos  LancamentoItemTag[]
+
+  @@map("tags")
+}
+
+model LancamentoItemTag {
+  lancamentoItemId Int    @map("lancamento_item_id")
+  tagId            String @map("tag_id") @db.Uuid
+
+  lancamentoItem   LancamentoItem @relation(fields: [lancamentoItemId], references: [id])
+  tag              Tag @relation(fields: [tagId], references: [id])
+
+  @@id([lancamentoItemId, tagId])
+  @@map("lancamento_item_tags")
+}
+
+// ==========================================================
+// SPED MAPPINGS
+// ==========================================================
+
+model SpedMapping {
+  id           String @id @default(uuid()) @db.Uuid
+  contaId      Int    @map("conta_id")
+  spedCode     String @map("sped_code")
+  description  String?
+
+  conta        PlanoContas @relation(fields: [contaId], references: [id])
+
+  @@map("sped_mappings")
+}
+
+// ==========================================================
+// USUÁRIOS
+// ==========================================================
+
+model Usuario {
+  id             String    @id @default(uuid()) @db.Uuid
+  nome           String
+  email          String    @unique
+  passwordHash   String    @map("password_hash")
+  isActive       Boolean   @default(true) @map("is_active")
+  lastLoginAt    DateTime? @map("last_login_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  sessoes              UsuarioSessao[]
+  empresas             EmpresaUsuario[]
+  reportVersions       ReportVersion[]
+  travaContabil        TravaContabil[]
+  ecdArquivos          EcdArquivo[]
+  assinaturasDigitais  AssinaturaDigital[]
+  auditLogs            AuditLog[]
+
+  @@map("usuarios")
+}
+
+// ==========================================================
+// REGRAS / PERMISSÕES
+// ==========================================================
+
+model Regra {
+  id      String @id @default(uuid()) @db.Uuid
+  code    String @unique
+  name    String
+
+  permissoes      RegraPermissao[]
+  empresaUsuarios EmpresaUsuario[]
+
+  @@map("regras")
+}
+
+model Permissao {
+  id          String @id @default(uuid()) @db.Uuid
+  code        String @unique
+  descricao   String?
+
+  regras       RegraPermissao[]
+
+  @@map("permissoes")
+}
+
+model RegraPermissao {
+  roleId        String @map("role_id") @db.Uuid
+  permissionId  String @map("permission_id") @db.Uuid
+
+  role          Regra @relation(fields: [roleId], references: [id])
+  permission    Permissao @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@map("regra_permissao")
+}
+
+model EmpresaUsuario {
+  userId     String @map("user_id") @db.Uuid
+  companyId  Int    @map("company_id")
+  roleId     String? @map("role_id") @db.Uuid
+
+  usuario    Usuario @relation(fields: [userId], references: [id])
+  empresa    Empresa @relation(fields: [companyId], references: [id])
+  regra      Regra? @relation(fields: [roleId], references: [id])
+
+  @@id([userId, companyId])
+  @@map("empresa_usuario")
+}
+
+// ==========================================================
+// SESSÕES
+// ==========================================================
+
+model UsuarioSessao {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  token       String   @unique
+  ipAddress   String?  @map("ip_address") @db.Inet
+  userAgent   String?  @map("user_agent")
+  expiresAt   DateTime @map("expires_at")
+  revoked     Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  usuario     Usuario @relation(fields: [userId], references: [id])
+
+  @@map("usuario_sessoes")
+}
+
+// ==========================================================
+// AUDIT LOGS
+// ==========================================================
+
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  companyId   Int?     @map("company_id")
+  userId      String?  @map("user_id") @db.Uuid
+  entityName  String?  @map("entity_name")
+  entityId    String?  @map("entity_id")
+  action      String?
+  oldData     Json?    @map("old_data")
+  newData     Json?    @map("new_data")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  empresa     Empresa? @relation(fields: [companyId], references: [id])
+  usuario     Usuario? @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// ==========================================================
+// SPED NATUREZA
+// ==========================================================
+
+model SpedNatureza {
+  id           String @id @default(uuid()) @db.Uuid
+  code         String @unique
+  description  String
+
+  @@map("sped_natureza")
+}
+
+// ==========================================================
+// REPORT VERSIONS
+// ==========================================================
+
+model ReportVersion {
+  id                String   @id @default(uuid()) @db.Uuid
+  empresaId         Int      @map("empresa_id")
+  reportTemplateId  String?  @map("report_template_id") @db.Uuid
+  reportTypeId      String?  @map("report_type_id") @db.Uuid
+  versionNumber     Int      @map("version_number")
+  fiscalYear        Int      @map("fiscal_year")
+  startPeriod       DateTime @map("start_period") @db.Date
+  endPeriod         DateTime @map("end_period") @db.Date
+  generatedBy       String?  @map("generated_by") @db.Uuid
+  isLocked          Boolean  @default(false) @map("is_locked")
+  notes             String?
+  integrityHash     String?  @map("integrity_hash")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  empresa           Empresa @relation(fields: [empresaId], references: [id])
+  reportTemplate    ReportTemplate? @relation(fields: [reportTemplateId], references: [id])
+  reportType        ReportType? @relation(fields: [reportTypeId], references: [id])
+  usuario           Usuario? @relation(fields: [generatedBy], references: [id])
+
+  lines             ReportVersionLine[]
+
+  @@map("report_versions")
+}
+
+model ReportVersionLine {
+  id               String   @id @default(uuid()) @db.Uuid
+  reportVersionId  String   @map("report_version_id") @db.Uuid
+  lineOrder        Int?     @map("line_order")
+  code             String?
+  title            String?
+  amount           Decimal? @db.Decimal(18, 2)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  reportVersion    ReportVersion @relation(fields: [reportVersionId], references: [id])
+
+  @@map("report_version_lines")
+}
+
+// ==========================================================
+// TRAVA CONTÁBIL
+// ==========================================================
+
+model TravaContabil {
+  id          String    @id @default(uuid()) @db.Uuid
+  empresaId   Int       @map("empresa_id")
+  year        Int
+  month       Int
+  isClosed    Boolean   @default(false) @map("is_closed")
+  closedBy    String?   @map("closed_by") @db.Uuid
+  closedAt    DateTime? @map("closed_at")
+
+  empresa     Empresa @relation(fields: [empresaId], references: [id])
+  usuario     Usuario? @relation(fields: [closedBy], references: [id])
+
+  @@map("trava_contabil")
+}
+
+// ==========================================================
+// CERTIFICADOS DIGITAIS
+// ==========================================================
+
+model CertificadoDigital {
+  id               String    @id @default(uuid()) @db.Uuid
+  empresaId        Int       @map("empresa_id")
+  certificateName  String?   @map("certificate_name")
+  serialNumber     String?   @map("serial_number")
+  validFrom        DateTime? @map("valid_from") @db.Date
+  validUntil       DateTime? @map("valid_until") @db.Date
+  issuer           String?
+  encryptedPfx     Bytes?    @map("encrypted_pfx")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  empresa          Empresa @relation(fields: [empresaId], references: [id])
+
+  assinaturas      AssinaturaDigital[]
+
+  @@map("certificados_digitais")
+}
+
+// ==========================================================
+// ECD
+// ==========================================================
+
+model EcdArquivo {
+  id            String    @id @default(uuid()) @db.Uuid
+  empresaId     Int       @map("empresa_id")
+  fiscalYear    Int       @map("fiscal_year")
+  fileName      String?   @map("file_name")
+  fileHash      String?   @map("file_hash")
+  generatedBy   String?   @map("generated_by") @db.Uuid
+  generatedAt   DateTime  @default(now()) @map("generated_at")
+  signedAt      DateTime? @map("signed_at")
+  deliveredAt   DateTime? @map("delivered_at")
+  status        String?
+
+  empresa       Empresa @relation(fields: [empresaId], references: [id])
+  usuario       Usuario? @relation(fields: [generatedBy], references: [id])
+
+  assinaturas   AssinaturaDigital[]
+
+  @@map("ecd_arquivos")
+}
+
+model AssinaturaDigital {
+  id              String   @id @default(uuid()) @db.Uuid
+  ecdFileId       String   @map("ecd_file_id") @db.Uuid
+  signedBy        String?  @map("signed_by") @db.Uuid
+  certificateId   String?  @map("certificate_id") @db.Uuid
+  signatureHash   String   @map("signature_hash")
+  signedAt        DateTime @default(now()) @map("signed_at")
+
+  ecdArquivo      EcdArquivo @relation(fields: [ecdFileId], references: [id])
+  usuario         Usuario? @relation(fields: [signedBy], references: [id])
+  certificado     CertificadoDigital? @relation(fields: [certificateId], references: [id])
+
+  @@map("assinaturas_digitais")
+}
+
+// ==========================================================
+// SPED ENTREGAS
+// ==========================================================
+
+model SpedEntrega {
+  id             String    @id @default(uuid()) @db.Uuid
+  empresaId      Int       @map("empresa_id")
+  spedType       String?   @map("sped_type")
+  fiscalYear     Int?      @map("fiscal_year")
+  protocol       String?
+  receiptNumber  String?   @map("receipt_number")
+  deliveredAt    DateTime? @map("delivered_at")
+  status         String?
+
+  empresa        Empresa @relation(fields: [empresaId], references: [id])
+
+  @@map("sped_entregas")
+}
+
+// ==========================================================
+// JOBS
+// ==========================================================
+
+model Job {
+  id           String    @id @default(uuid()) @db.Uuid
+  queueName    String?   @map("queue_name")
+  payload      Json?
+  status       String    @default("PENDING")
+  retries      Int       @default(0)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  processedAt  DateTime? @map("processed_at")
+
+  @@map("jobs")
+}
+
+// ==========================================================
+// CONFIGURAÇÃO EMPRESA
+// ==========================================================
+
+model EmpresaConfiguracao {
+  empresaId                     Int      @id @map("empresa_id")
+  permitirDinheiroNegativo     Boolean  @default(false) @map("permitir_dinheiro_negativo")
+  periodoFechamentoAutomatico  Boolean  @default(false) @map("periodo_fechamento_automatico")
+  defaultReportTemplate        String?  @map("default_report_template") @db.Uuid
+  createdAt                    DateTime @default(now()) @map("created_at")
+
+  empresa        Empresa @relation(fields: [empresaId], references: [id])
+  reportTemplate ReportTemplate? @relation(fields: [defaultReportTemplate], references: [id])
+
+  @@map("empresa_configuracao")
+}
