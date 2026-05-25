@@ -1,7 +1,15 @@
 {
   "name": "pjla_contabil_backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "backend para escritorio contabil",
+  "keywords": [
+    "escritorio",
+    "contabil",
+    "contabilidade",
+    "pjla",
+    "pjlaapps",
+    "pjla_contabil"
+  ],
   "homepage": "https://github.com/seupaulao/pjla_contabil_backend#readme",
   "bugs": {
     "url": "https://github.com/seupaulao/pjla_contabil_backend/issues"
@@ -11,7 +19,7 @@
     "url": "git+https://github.com/seupaulao/pjla_contabil_backend.git"
   },
   "license": "ISC",
-  "author": "",
+  "author": "pjlaapps@gmail.com",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
