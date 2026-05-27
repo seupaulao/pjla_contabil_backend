@@ -79,7 +79,7 @@ model Empresa {
 // ==========================================================
 
 model PlanoContasReferencial {
-  id                     Int      @id
+  id                     Int       @id @default(autoincrement())
   codigo                 String
   nome                   String
   tipo                   String?
@@ -104,7 +104,7 @@ model PlanoContasReferencial {
 // ==========================================================
 
 model PlanoContas {
-  id                          Int      @id
+  id                          Int      @id @default(autoincrement())
   empresaId                   Int?     @map("empresa_id")
   planoContasReferencialId    Int?     @map("plano_contas_referencial_id")
   codigo                      String
@@ -140,7 +140,7 @@ model PlanoContas {
 // ==========================================================
 
 model Lancamento {
-  id          Int       @id
+  id          Int       @id @default(autoincrement())
   empresaId   Int?      @map("empresa_id")
   data        DateTime  @db.Date
   historico   String?
@@ -156,7 +156,7 @@ model Lancamento {
 }
 
 model LancamentoItem {
-  id               Int             @id
+  id               Int             @id @default(autoincrement())
   lancamentoId     Int?            @map("lancamento_id")
   contaId          Int?            @map("conta_id")
   tipo             LancamentoTipo
