@@ -107,6 +107,200 @@ fastify.delete('/api/plano_contas/:id', async (request, reply) => {
 });
 
 // =========================
+// lancamento
+// =========================
+fastify.get('/api/lancamento', async (request, reply) => {
+  const result = await prisma.lancamento.findMany();
+  reply.send(result);
+});
+
+fastify.get('/api/lancamento/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.lancamento.findUnique({ where: { id: Number(id) } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+
+fastify.post('/api/lancamento', async (request, reply) => {
+  const data = request.body as any;
+  const result = await prisma.lancamento.create({ data });
+  reply.code(201).send(result);
+});
+
+fastify.put('/api/lancamento/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.lancamento.update({ where: { id: Number(id) }, data });
+  reply.send(result);
+});
+
+fastify.delete('/api/lancamento/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  await prisma.lancamento.delete({ where: { id: Number(id) } });
+  reply.code(204).send();
+});
+
+fastify.get('/api/empresa/:id/lancamento/:data', async (request, reply) => {
+  const { id, data } = request.params as any;
+  const result = await prisma.lancamento.findMany({ where: { empresaId: Number(id), data: new Date(data) } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+
+fastify.get('/api/empresa/:id/lancamento', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.lancamento.findMany({ where: { empresaId: Number(id) } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+fastify.get('/api/lancamento/:id/itens', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.lancamentoItem.findMany({ where: { lancamentoId: Number(id) } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+
+fastify.get('/api/lancamento/:id/itens/:idLancamentoItem', async (request, reply) => {
+  const { id, idLancamentoItem } = request.params as any;
+  const result = await prisma.lancamentoItem.findUnique({ where: { id: Number(idLancamentoItem), lancamentoId: Number(id) } });
+  if (!result)return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+
+fastify.put('/api/lancamento/:id/itens/:idLancamentoItem', async (request, reply) => {
+  const { id, idLancamentoItem } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.lancamentoItem.update({ where: { id: Number(idLancamentoItem), lancamentoId: Number(id) }, data });
+  reply.send(result);
+});
+
+fastify.delete('/api/lancamento/:id/itens/:idLancamentoItem', async (request, reply) => {
+  const { id, idLancamentoItem } = request.params as any;
+  await prisma.lancamentoItem.delete({ where: { id: Number(idLancamentoItem), lancamentoId: Number(id) } });
+  reply.code(204).send();
+});
+// ### mapa das demonstracoes
+
+// GET /api/mapademonstracoes
+fastify.get('/api/mapademonstracoes', async (request, reply) => {
+  const result = await prisma.mapaDemonstracoes.findMany();
+  reply.send(result);
+});
+// GET /api/mapademonstracoes/{id}
+fastify.get('/api/mapademonstracoes/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.mapaDemonstracoes.findUnique({ where: { id: Number(id) } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+// GET /api/plano_contas/{id}/mapademonstracoes/{id}
+fastify.get('/api/plano_contas/:id/mapademonstracoes/:idMapa', async (request, reply) => {
+  const { id, idMapa } = request.params as any;
+  const result = await prisma.mapaDemonstracoes.findUnique({ where: { id: Number(idMapa), contaId: Number(id) } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+// POST /api/mapademonstracoes
+fastify.post('/api/mapademonstracoes', async (request, reply) => {
+  const data = request.body as any;
+  const result = await prisma.mapaDemonstracoes.create({ data });
+  reply.code(201).send(result);
+});
+// PUT /api/mapademonstracoes/{id}
+fastify.put('/api/mapademonstracoes/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.mapaDemonstracoes.update({ where: { id: Number(id) }, data });
+  reply.send(result);
+});
+// DELETE /api/mapademonstracoes/{id}
+fastify.delete('/api/mapademonstracoes/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  await prisma.mapaDemonstracoes.delete({ where: { id: Number(id) } });
+  reply.code(204).send();
+});
+
+// ### SpedMapping
+
+fastify.get('/api/spedmapping', async (request, reply) => {
+  const result = await prisma.spedMapping.findMany();
+  reply.send(result);
+});
+
+fastify.get('/api/plano_contas/:contaid/spedmapping/:spedcode', async (request, reply) => {
+  const { contaid, spedcode } = request.params as any;
+  const result = await prisma.spedMapping.findMany({ where: { contaId: Number(contaid), spedCode: spedcode } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+ 
+fastify.get('/api/plano_contas/:contaid/spedmapping', async (request, reply) => {
+  const { contaid } = request.params as any;
+  const result = await prisma.spedMapping.findMany({ where: { contaId: Number(contaid) } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+
+fastify.post('/api/spedmapping', async (request, reply) => {
+  const data = request.body as any;
+  const result = await prisma.spedMapping.create({ data });
+  reply.code(201).send(result);
+});
+
+fastify.put('/api/spedmapping/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.spedMapping.update({ where: { id: id }, data });
+  reply.send(result);
+});
+
+fastify.delete('/api/spedmapping/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  await prisma.spedMapping.delete({ where: { id: id } });
+  reply.code(204).send();
+});
+
+// ### Usuario
+
+fastify.get('/api/usuario', async (request, reply) => {
+  const result = await prisma.usuario.findMany();
+  reply.send(result);
+});
+
+fastify.get('/api/usuario/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.usuario.findUnique({ where: { id: id } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+
+fastify.get('/api/usuario/active/:isActive', async (request, reply) => {
+  const { isActive } = request.params as any;
+  const result = await prisma.usuario.findMany({ where: { isActive: isActive === 'true' } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+
+fastify.post('/api/usuario', async (request, reply) => {
+  const data = request.body as any;
+  const result = await prisma.usuario.create({ data });
+  reply.code(201).send(result);
+});
+
+fastify.put('/api/usuario/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.usuario.update({ where: { id: id }, data });
+  reply.send(result);
+});
+
+fastify.delete('/api/usuario/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  await prisma.usuario.delete({ where: { id: id } });
+  reply.code(204).send();
+});
+
+// =========================
 // Inicialização do servidor
 // =========================
 const start = async () => {

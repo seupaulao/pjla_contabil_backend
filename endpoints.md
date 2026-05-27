@@ -28,16 +28,6 @@ DELETE /api/plano_contas/{id}
 GET /api/empresa/{id}/plano_contas/{codigo}
 GET /api/empresa/{id}/plano_contas/{nome}
 
-### centro de custo
-GET /api/centro_custos
-GET /api/empresa/{id}/centro_custos
-GET /api/empresa/{id}/centro_custos/{id}
-GET /api/centro_custos/{id}
-POST /api/centro_custos
-PUT /api/centro_custos/{id}
-DELETE /api/centro_custos/{id}
-
-
 ### lancamento
 
 GET /api/lancamento
