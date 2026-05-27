@@ -44,8 +44,9 @@ model Empresa {
   excluidoAt  DateTime? @map("excluido_at")
 
   planoContas              PlanoContas[]
+  centroCustos             CentroCusto[]
   lancamentos              Lancamento[]
-  // reportTemplates          ReportTemplate[]
+  reportTemplates          ReportTemplate[]
   tags                     Tag[]
   reportVersions           ReportVersion[]
   travaContabil            TravaContabil[]
@@ -63,16 +64,16 @@ model Empresa {
 // REPORT TYPES
 // ==========================================================
 
-// model ReportType {
-//   id    String @id @default(uuid()) @db.Uuid
-//   code  String @unique @db.VarChar(30)
-//   name  String
+model ReportType {
+  id    String @id @default(uuid()) @db.Uuid
+  code  String @unique @db.VarChar(30)
+  name  String
 
-//   // reportTemplates ReportTemplate[]
-//   reportVersions  ReportVersion[]
+  reportTemplates ReportTemplate[]
+  reportVersions  ReportVersion[]
 
-//   @@map("report_types")
-// }
+  @@map("report_types")
+}
 
 // ==========================================================
 // PLANO DE CONTAS REFERENCIAL
@@ -90,6 +91,7 @@ model PlanoContasReferencial {
   fluxoCaixaTipo         String?  @map("fluxo_caixa_tipo")
   createdAt              DateTime @default(now()) @map("created_at")
   excludedAt             DateTime? @map("excluded_at")
+
   parentId               Int? @map("parent_id")
   parent                 PlanoContasReferencial? @relation("PlanoRefHierarchy", fields: [parentId], references: [id])
   children               PlanoContasReferencial[] @relation("PlanoRefHierarchy")
@@ -112,6 +114,8 @@ model PlanoContas {
   tipo                        String
   natureza                    String?
   nivel                       Int
+  codigoReferencial           String?  @map("codigo_referencial")
+  aceitaLancamento            Boolean  @default(true) @map("aceita_lancamento")
   grupo                       String?
   subgrupo                    String?
   dreGrupo                    String?  @map("dre_grupo")
@@ -128,11 +132,28 @@ model PlanoContas {
   subContas                   PlanoContas[] @relation("PlanoContasHierarchy")
 
   lancamentoItens             LancamentoItem[]
-  // reportLineAccounts          ReportLineAccount[]
+  reportLineAccounts          ReportLineAccount[]
   mapaDemonstracoes           MapaDemonstracoes[]
   spedMappings                SpedMapping[]
 
   @@map("plano_contas")
+}
+
+// ==========================================================
+// CENTRO DE CUSTO
+// ==========================================================
+
+model CentroCusto {
+  id         String   @id @default(uuid()) @db.Uuid
+  empresaId  Int      @map("empresa_id")
+  codigo     String?
+  nome       String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  empresa            Empresa @relation(fields: [empresaId], references: [id])
+  lancamentoItens    LancamentoItem[]
+
+  @@map("centro_custo")
 }
 
 // ==========================================================
@@ -159,11 +180,13 @@ model LancamentoItem {
   id               Int             @id
   lancamentoId     Int?            @map("lancamento_id")
   contaId          Int?            @map("conta_id")
+  centroCustoId    String?         @map("centro_custo_id") @db.Uuid
   tipo             LancamentoTipo
   valor            Decimal         @db.Decimal(14, 2)
 
   lancamento       Lancamento?     @relation(fields: [lancamentoId], references: [id], onDelete: Cascade)
   conta            PlanoContas?    @relation(fields: [contaId], references: [id])
+  centroCusto      CentroCusto?    @relation(fields: [centroCustoId], references: [id])
 
   tags             LancamentoItemTag[]
 
@@ -175,57 +198,57 @@ model LancamentoItem {
 // REPORT TEMPLATES
 // ==========================================================
 
-// model ReportTemplate {
-//   id             String   @id @default(uuid()) @db.Uuid
-//   empresaId      Int?     @map("empresa_id")
-//   reportTypeId   String   @map("report_type_id") @db.Uuid
-//   name           String
-//   isDefault      Boolean  @default(false) @map("is_default")
-//   createdAt      DateTime @default(now()) @map("created_at")
+model ReportTemplate {
+  id             String   @id @default(uuid()) @db.Uuid
+  empresaId      Int?     @map("empresa_id")
+  reportTypeId   String   @map("report_type_id") @db.Uuid
+  name           String
+  isDefault      Boolean  @default(false) @map("is_default")
+  createdAt      DateTime @default(now()) @map("created_at")
 
-//   empresa         Empresa? @relation(fields: [empresaId], references: [id])
-//   reportType      ReportType @relation(fields: [reportTypeId], references: [id])
+  empresa         Empresa? @relation(fields: [empresaId], references: [id])
+  reportType      ReportType @relation(fields: [reportTypeId], references: [id])
 
-//   lines           ReportTemplateLine[]
-//   reportVersions  ReportVersion[]
-//   configuracoes   EmpresaConfiguracao[]
+  lines           ReportTemplateLine[]
+  reportVersions  ReportVersion[]
+  configuracoes   EmpresaConfiguracao[]
 
-//   @@map("report_templates")
-// }
+  @@map("report_templates")
+}
 
-// model ReportTemplateLine {
-//   id          String   @id @default(uuid()) @db.Uuid
-//   templateId  String   @map("template_id") @db.Uuid
-//   lineOrder   Int      @map("line_order")
-//   code        String?
-//   title       String
-//   lineType    String   @map("line_type")
-//   formula     String?
-//   isBold      Boolean  @default(false) @map("is_bold")
-//   createdAt   DateTime @default(now()) @map("created_at")
+model ReportTemplateLine {
+  id          String   @id @default(uuid()) @db.Uuid
+  templateId  String   @map("template_id") @db.Uuid
+  lineOrder   Int      @map("line_order")
+  code        String?
+  title       String
+  lineType    String   @map("line_type")
+  formula     String?
+  isBold      Boolean  @default(false) @map("is_bold")
+  createdAt   DateTime @default(now()) @map("created_at")
 
-//   parentId    String? @map("parent_id") @db.Uuid
+  parentId    String? @map("parent_id") @db.Uuid
 
-//   template    ReportTemplate @relation(fields: [templateId], references: [id])
+  template    ReportTemplate @relation(fields: [templateId], references: [id])
 
-//   parent      ReportTemplateLine? @relation("ReportLineHierarchy", fields: [parentId], references: [id])
-//   children    ReportTemplateLine[] @relation("ReportLineHierarchy")
+  parent      ReportTemplateLine? @relation("ReportLineHierarchy", fields: [parentId], references: [id])
+  children    ReportTemplateLine[] @relation("ReportLineHierarchy")
 
-//   accounts    ReportLineAccount[]
+  accounts    ReportLineAccount[]
 
-//   @@map("report_template_lines")
-// }
+  @@map("report_template_lines")
+}
 
-// model ReportLineAccount {
-//   id            String @id @default(uuid()) @db.Uuid
-//   reportLineId  String @map("report_line_id") @db.Uuid
-//   contaId       Int    @map("conta_id")
+model ReportLineAccount {
+  id            String @id @default(uuid()) @db.Uuid
+  reportLineId  String @map("report_line_id") @db.Uuid
+  contaId       Int    @map("conta_id")
 
-//   reportLine    ReportTemplateLine @relation(fields: [reportLineId], references: [id])
-//   conta         PlanoContas @relation(fields: [contaId], references: [id])
+  reportLine    ReportTemplateLine @relation(fields: [reportLineId], references: [id])
+  conta         PlanoContas @relation(fields: [contaId], references: [id])
 
-//   @@map("report_line_accounts")
-// }
+  @@map("report_line_accounts")
+}
 
 // ==========================================================
 // MAPA DEMONSTRAÇÕES
@@ -429,8 +452,8 @@ model ReportVersion {
   createdAt         DateTime @default(now()) @map("created_at")
 
   empresa           Empresa @relation(fields: [empresaId], references: [id])
-  // reportTemplate    ReportTemplate? @relation(fields: [reportTemplateId], references: [id])
-  // reportType        ReportType? @relation(fields: [reportTypeId], references: [id])
+  reportTemplate    ReportTemplate? @relation(fields: [reportTemplateId], references: [id])
+  reportType        ReportType? @relation(fields: [reportTypeId], references: [id])
   usuario           Usuario? @relation(fields: [generatedBy], references: [id])
 
   lines             ReportVersionLine[]
@@ -579,7 +602,7 @@ model EmpresaConfiguracao {
   createdAt                    DateTime @default(now()) @map("created_at")
 
   empresa        Empresa @relation(fields: [empresaId], references: [id])
-  // reportTemplate ReportTemplate? @relation(fields: [defaultReportTemplate], references: [id])
+  reportTemplate ReportTemplate? @relation(fields: [defaultReportTemplate], references: [id])
 
   @@map("empresa_configuracao")
 }

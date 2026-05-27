@@ -1,9 +1,9 @@
-FROM postgres:16
+FROM node:22
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npx prisma generate
+EXPOSE 3000
 
-ENV POSTGRES_USER=postgres
-ENV POSTGRES_PASSWORD=postgres
-ENV POSTGRES_DB=meubanco
-
-EXPOSE 5432
-
-VOLUME ["/var/lib/postgresql/data"]
+CMD ["npm", "run", "dev"]

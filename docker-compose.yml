@@ -33,21 +33,22 @@ services:
     depends_on:
       - postgres
 
-  api:
-    build: .
+#  deixei comentado o container porque está com problema pra subir, vou subir localmente mesmo, mas deixei o código aqui pra referência de como seria a configuração do docker-compose
+#   api:
+#     build: .
 
-    container_name: fastify-api
+#     container_name: fastify-api
 
-    restart: always
+#     restart: always
 
-    ports:
-      - "3000:3000"
+#     ports:
+#       - "3000:3000"
 
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/contabilidade?schema=public
+#     environment:
+#       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/contabilidade?schema=public
 
-    depends_on:
-      - postgres
+#     depends_on:
+#       - postgres
 
 volumes:
   postgres_data:
