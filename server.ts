@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
-import prisma from './lib/prisma';
+import { Type } from '@sinclair/typebox';
+import { prisma } from './lib/prisma';
 
 const fastify = Fastify({ logger: true });
 
