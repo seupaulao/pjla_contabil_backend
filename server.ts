@@ -80,6 +80,12 @@ fastify.get('/api/plano_contas', async (request, reply) => {
   reply.send(result);
 });
 
+fastify.get('/api/empresa/:id/plano_contas', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.planoContas.findMany({ where: { empresaId: Number(id) } });
+  reply.send(result);
+});
+
 fastify.get('/api/plano_contas/:id', async (request, reply) => {
   const { id } = request.params as any;
   const result = await prisma.planoContas.findUnique({ where: { id: Number(id) } });
@@ -104,6 +110,28 @@ fastify.delete('/api/plano_contas/:id', async (request, reply) => {
   const { id } = request.params as any;
   await prisma.planoContas.delete({ where: { id: Number(id) } });
   reply.code(204).send();
+});
+
+//copiar plano conta referencial para plano de contas da empresa
+fastify.post('/api/empresa/:id/copy_plano_contas_referencial', async (request, reply) => {
+  const { id } = request.params as any;
+  const empresa = await prisma.empresa.findUnique({ where: { id: Number(id) } });
+  if (!empresa) return reply.code(404).send({ error: 'Empresa not found' });
+  const planoContasReferencial = await prisma.planoContasReferencial.findMany();
+  const planoContasData = planoContasReferencial.map((conta) => ({
+    codigo: conta.codigo,
+    descricao: conta.nome,
+    tipo: conta.tipo,
+    natureza: conta.natureza,
+    nivel: conta.nivel,
+    grupo: conta.grupo,
+    dreGrupo: conta.dreGrupo,
+    fluxoCaixaTipo: conta.fluxoCaixaTipo,
+    planoContasReferencialId: conta.id,
+    empresaId: Number(id),
+  }));
+  await prisma.planoContas.createMany({ data: planoContasData });
+  reply.send({ message: 'Plano de Contas copiado com sucesso' });
 });
 
 // =========================

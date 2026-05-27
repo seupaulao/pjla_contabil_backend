@@ -79,7 +79,7 @@ model Empresa {
 // ==========================================================
 
 model PlanoContasReferencial {
-  id                     Int       @id @default(autoincrement())
+  id                     Int       @id
   codigo                 String
   nome                   String
   tipo                   String?
@@ -109,9 +109,9 @@ model PlanoContas {
   planoContasReferencialId    Int?     @map("plano_contas_referencial_id")
   codigo                      String
   descricao                   String
-  tipo                        String
+  tipo                        String?
   natureza                    String?
-  nivel                       Int
+  nivel                       Int?
   grupo                       String?
   subgrupo                    String?
   dreGrupo                    String?  @map("dre_grupo")
@@ -119,13 +119,13 @@ model PlanoContas {
   createdAt                   DateTime @default(now()) @map("created_at")
   excluidoAt                  DateTime? @map("excluido_at")
 
-  contaPaiId                  Int? @map("conta_pai_id")
+  // contaPaiId                  Int? @map("conta_pai_id")
 
   empresa                     Empresa? @relation(fields: [empresaId], references: [id])
   planoReferencial            PlanoContasReferencial? @relation(fields: [planoContasReferencialId], references: [id])
 
-  contaPai                    PlanoContas? @relation("PlanoContasHierarchy", fields: [contaPaiId], references: [id])
-  subContas                   PlanoContas[] @relation("PlanoContasHierarchy")
+  // contaPai                    PlanoContas? @relation("PlanoContasHierarchy", fields: [contaPaiId], references: [id])
+  // subContas                   PlanoContas[] @relation("PlanoContasHierarchy")
 
   lancamentoItens             LancamentoItem[]
   // reportLineAccounts          ReportLineAccount[]

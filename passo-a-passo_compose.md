@@ -164,11 +164,20 @@ docker compose up -d
 
 docker exec -it fastify-api sh
 
-### 3. Criar migration - rodar isso dentro do container para aplicacao producao, ou fora do container para localhost
+### 3. Gerar pasta generated - fontes do prisma do schema.prisma
 
-npx prisma migrate dev --name init
+A cada alteração do schema.prisma, deve rodar esse comando:
 
-## PgAdmin
+`npx prisma generate`
+
+### 4. Criar migration - rodar isso dentro do container para aplicacao producao, ou fora do container para localhost
+
+deve rodar esse comando para fazer com que o BANCO enxergue da mesma forma que o SCHEMA
+
+`npx prisma migrate dev --name init`
+
+
+## Acesso PgAdmin
 
 **Acesso**
 
@@ -181,3 +190,7 @@ npx prisma migrate dev --name init
 **Senha**
 
 `admin`
+
+### Servidor - Localhost only
+
+`npx tsx server.ts`
