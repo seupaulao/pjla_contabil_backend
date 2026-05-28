@@ -1,8 +1,110 @@
 import Fastify from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { prisma } from './lib/prisma';
+import { AssinaturaService } from './assinatura';
+
+const assinaturaService = new AssinaturaService();
 
 const fastify = Fastify({ logger: true });
+
+
+//trava contabil
+
+fastify.post('/api/trava_contabil', async (request, reply) => {
+  const data = request.body as any;
+  const result = await prisma.travaContabil.create({ data });
+  reply.code(201).send(result);
+});
+fastify.get('/api/empresa/:id/trava_contabil', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.travaContabil.findMany({ where: { empresaId: Number(id) } });
+  reply.send(result);
+});
+fastify.get('/api/trava_contabil/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.travaContabil.findUnique({ where: { id: id } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+fastify.put('/api/trava_contabil/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.travaContabil.update({ where: { id: id }, data });
+  reply.send(result);
+});
+fastify.delete('/api/trava_contabil/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  await prisma.travaContabil.delete({ where: { id: id } });
+  reply.code(204).send();
+});
+
+// =========================
+// empresa - prestadora de serviço
+// =========================
+fastify.get('/api/empresa', async (request, reply) => {
+  const result = await prisma.empresa.findMany();
+  reply.send(result);
+});
+
+fastify.get('/api/empresa/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.empresa.findUnique({ where: { id: Number(id) } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+
+fastify.post('/api/empresa', async (request, reply) => {
+  const data = request.body as any;
+  const result = await prisma.empresa.create({ data });
+  reply.code(201).send(result);
+});
+
+fastify.put('/api/empresa/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.empresa.update({ where: { id: Number(id) }, data });
+  reply.send(result);
+});
+
+fastify.delete('/api/empresa/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  await prisma.empresa.delete({ where: { id: Number(id) } });
+  reply.code(204).send();
+});
+
+// =========================
+// tomador - empresa tomadora do serviço
+// =========================
+fastify.get('/api/tomador', async (request, reply) => {
+  const result = await prisma.tomador.findMany();
+  reply.send(result);
+});
+
+fastify.get('/api/tomador/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.tomador.findUnique({ where: { id: Number(id) } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+
+fastify.post('/api/tomador', async (request, reply) => {
+  const data = request.body as any;
+  const result = await prisma.tomador.create({ data });
+  reply.code(201).send(result);
+});
+
+fastify.put('/api/tomador/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.tomador.update({ where: { id: Number(id) }, data });
+  reply.send(result);
+});
+
+fastify.delete('/api/tomador/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  await prisma.tomador.delete({ where: { id: Number(id) } });
+  reply.code(204).send();
+});
 
 // =========================
 // plano_contas_referencial
@@ -38,39 +140,6 @@ fastify.delete('/api/plano_contas_referencial/:id', async (request, reply) => {
   reply.code(204).send();
 });
 
-// =========================
-// empresa
-// =========================
-fastify.get('/api/empresa', async (request, reply) => {
-  const result = await prisma.empresa.findMany();
-  reply.send(result);
-});
-
-fastify.get('/api/empresa/:id', async (request, reply) => {
-  const { id } = request.params as any;
-  const result = await prisma.empresa.findUnique({ where: { id: Number(id) } });
-  if (!result) return reply.code(404).send({ error: 'Not found' });
-  reply.send(result);
-});
-
-fastify.post('/api/empresa', async (request, reply) => {
-  const data = request.body as any;
-  const result = await prisma.empresa.create({ data });
-  reply.code(201).send(result);
-});
-
-fastify.put('/api/empresa/:id', async (request, reply) => {
-  const { id } = request.params as any;
-  const data = request.body as any;
-  const result = await prisma.empresa.update({ where: { id: Number(id) }, data });
-  reply.send(result);
-});
-
-fastify.delete('/api/empresa/:id', async (request, reply) => {
-  const { id } = request.params as any;
-  await prisma.empresa.delete({ where: { id: Number(id) } });
-  reply.code(204).send();
-});
 
 // =========================
 // plano_contas
@@ -326,6 +395,105 @@ fastify.delete('/api/usuario/:id', async (request, reply) => {
   const { id } = request.params as any;
   await prisma.usuario.delete({ where: { id: id } });
   reply.code(204).send();
+});
+
+//========================
+//crud assinatura digital
+//========================
+
+fastify.post('/api/assinar', async (request, reply) => {
+  const { xml } = request.body as any;
+  const xmlAssinado = await assinaturaService.assinar(xml);
+  reply.send({ xmlAssinado });
+});
+
+fastify.get('/api/assinatura_digital', async (request, reply) => {
+  const result = await prisma.assinaturaDigital.findMany();
+  reply.send(result);
+});
+fastify.get('/api/assinatura_digital/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.assinaturaDigital.findUnique({ where: { id: id } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+fastify.post('/api/assinatura_digital', async (request, reply) => {
+  const data = request.body as any;
+  const result = await prisma.assinaturaDigital.create({ data });
+  reply.code(201).send(result);
+});
+fastify.put('/api/assinatura_digital/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.assinaturaDigital.update({ where: { id: id }, data });
+  reply.send(result);
+});
+fastify.delete('/api/assinatura_digital/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  await prisma.assinaturaDigital.delete({ where: { id: id } });
+  reply.code(204).send();
+});
+
+//========================
+//crud certificado digital
+//========================
+
+fastify.get('/api/certificado_digital', async (request, reply) => {
+  const result = await prisma.certificadoDigital.findMany();
+  reply.send(result);
+});
+fastify.get('/api/certificado_digital/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const result = await prisma.certificadoDigital.findUnique({ where: { id: id } });
+  if (!result) return reply.code(404).send({ error: 'Not found' });
+  reply.send(result);
+});
+fastify.post('/api/certificado_digital', async (request, reply) => {
+  const data = request.body as any;
+  const result = await prisma.certificadoDigital.create({ data });
+  reply.code(201).send(result);
+});
+fastify.put('/api/certificado_digital/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  const data = request.body as any;
+  const result = await prisma.certificadoDigital.update({ where: { id: id }, data });
+  reply.send(result);
+});
+fastify.delete('/api/certificado_digital/:id', async (request, reply) => {
+  const { id } = request.params as any;
+  await prisma.certificadoDigital.delete({ where: { id: id } });
+  reply.code(204).send();
+});
+
+//========================
+//crud nota fiscal
+//========================
+
+//serviço para criar nota fiscal, assinar e atualizar status - DEVE VALIDAR AINDA
+fastify.post("/nfe", async (req, reply) => {
+
+   const nota = await prisma.notaFiscal.create({
+      data: {
+         numero: 1,
+         xml: "<NFe>...</NFe>",
+         status: "CRIADA"
+      }
+   });
+
+   const xmlAssinado =
+      await assinaturaService.assinar(nota.xml);
+
+   await prisma.notaFiscal.update({
+      where: { id: nota.id },
+      data: {
+         xmlAssinado,
+         status: "ASSINADA"
+      }
+   });
+
+   return {
+      sucesso: true
+   };
 });
 
 // =========================
