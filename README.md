@@ -21,3 +21,6 @@ para saber como lidar com a arquitetura
 - prisma orm
 - fastfy
 - dotenv
+
+## comandos
+curl -XPOST localhost:3000/api/tomador -H "Content-type: application/json"-d '{"nome":"SOCIEDADE DE ASSISTENCIA E PROTECAO A INFANCIA DE FORTALEZA", "cnpj":"07253784000109"}'
